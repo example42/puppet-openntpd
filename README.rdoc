@@ -16,9 +16,21 @@ For detailed info about the logic and usage patterns of Example42 modules read R
 
 == USAGE - Basic management
 
-* Install openntpd with default settings
+* Install openntpd with default settings. It uses ntp.org ntp servers
 
         class { "openntpd": }
+
+* Install openntpd with custom ntp servers
+
+        class { "openntpd":
+          server => [ 'ntp1.example42.com' , 'ntp2.example42.com' ]
+        }
+
+* Install openntpd and act as ntp server
+
+        class { "openntpd":
+          server_local => true,
+        }
 
 * Disable openntpd service.
 
@@ -50,6 +62,7 @@ For detailed info about the logic and usage patterns of Example42 modules read R
 
         class { "openntpd":
           source => [ "puppet:///modules/lab42/openntpd/openntpd.conf-${hostname}" , "puppet:///modules/lab42/openntpd/openntpd.conf" ], 
+          template => undef, # You have to unset the default template
         }
 
 
@@ -63,7 +76,7 @@ For detailed info about the logic and usage patterns of Example42 modules read R
 * Use custom template for main config file 
 
         class { "openntpd":
-          template => "example42/openntpd/openntpd.conf.erb",      
+          template => "example42/openntpd/openntpd.conf.erb",
         }
 
 * Define custom options that can be used in a custom template without the

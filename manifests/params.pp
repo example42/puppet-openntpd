@@ -18,19 +18,19 @@ class openntpd::params {
 
   # Template for init file
   $file_init_content = $::operatingsystem ? {
-    /(?i:Debian|Ubuntu|Mint)/              => 'openntpd/openntpd_initd-debian.erb',
     /(?i:RedHat|Centos|Scientific|Fedora)/ => 'openntpd/openntpd_initd-redhat.erb',
+    default                                => 'openntpd/openntpd_initd-debian.erb',
   }
 
   # Ntp servers to use
   $server = [ '0.pool.ntp.org' , '1.pool.ntp.org' ]
 
   # If local host must be an ntp server
-  $server_local = 'false'
+  $server_local = false
 
   # Set the time immediately at startup if the local clock is off
   # by more than 180 seconds (option -s).
-  $force_startup_sync = 'true'
+  $force_startup_sync = true
 
 
   ### Application related parameters

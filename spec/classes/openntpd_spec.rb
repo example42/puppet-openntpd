@@ -14,7 +14,7 @@ describe 'openntpd' do
   end
 
   describe 'Test standard installation with monitoring and firewalling' do
-    let(:params) { {:monitor => true , :firewall => true, :port => '42' } }
+    let(:params) { {:monitor => true , :firewall => true, :port => '42', :protocol => 'udp'} }
 
     it { should contain_package('openntpd').with_ensure('present') }
     it { should contain_service('openntpd').with_ensure('running') }
@@ -25,13 +25,13 @@ describe 'openntpd' do
       content.should == true
     end
     it 'should place a firewall rule' do
-      content = catalogue.resource('firewall', 'openntpd_tcp_42').send(:parameters)[:enable]
+      content = catalogue.resource('firewall', 'openntpd_udp_42').send(:parameters)[:enable]
       content.should == true
     end
   end
 
   describe 'Test decommissioning - absent' do
-    let(:params) { {:absent => true, :monitor => true , :firewall => true, :port => '42'} }
+    let(:params) { {:absent => true, :monitor => true , :firewall => true, :port => '42', :protocol => 'udp'} }
 
     it 'should remove Package[openntpd]' do should contain_package('openntpd').with_ensure('absent') end 
     it 'should stop Service[openntpd]' do should contain_service('openntpd').with_ensure('stopped') end
@@ -42,13 +42,13 @@ describe 'openntpd' do
       content.should == false
     end
     it 'should remove a firewall rule' do
-      content = catalogue.resource('firewall', 'openntpd_tcp_42').send(:parameters)[:enable]
+      content = catalogue.resource('firewall', 'openntpd_udp_42').send(:parameters)[:enable]
       content.should == false
     end
   end
 
   describe 'Test decommissioning - disable' do
-    let(:params) { {:disable => true, :monitor => true , :firewall => true, :port => '42'} }
+    let(:params) { {:disable => true, :monitor => true , :firewall => true, :port => '42', :protocol => 'udp'} }
 
     it { should contain_package('openntpd').with_ensure('present') }
     it 'should stop Service[openntpd]' do should contain_service('openntpd').with_ensure('stopped') end
@@ -59,13 +59,13 @@ describe 'openntpd' do
       content.should == false
     end
     it 'should remove a firewall rule' do
-      content = catalogue.resource('firewall', 'openntpd_tcp_42').send(:parameters)[:enable]
+      content = catalogue.resource('firewall', 'openntpd_udp_42').send(:parameters)[:enable]
       content.should == false
     end
   end
 
   describe 'Test decommissioning - disableboot' do
-    let(:params) { {:disableboot => true, :monitor => true , :firewall => true, :port => '42'} }
+    let(:params) { {:disableboot => true, :monitor => true , :firewall => true, :port => '42', :protocol => 'udp'} }
   
     it { should contain_package('openntpd').with_ensure('present') }
     it { should_not contain_service('openntpd').with_ensure('present') }
@@ -77,7 +77,7 @@ describe 'openntpd' do
       content.should == false
     end
     it 'should keep a firewall rule' do
-      content = catalogue.resource('firewall', 'openntpd_tcp_42').send(:parameters)[:enable]
+      content = catalogue.resource('firewall', 'openntpd_udp_42').send(:parameters)[:enable]
       content.should == true
     end
   end 
@@ -156,23 +156,23 @@ describe 'openntpd' do
   end
 
   describe 'Test Firewall Tools Integration' do
-    let(:params) { {:firewall => true, :firewall_tool => "iptables" , :protocol => "tcp" , :port => "42" } }
+    let(:params) { {:firewall => true, :firewall_tool => "iptables" , :protocol => "tcp" , :port => "42" , :protocol => 'udp'} }
 
     it 'should generate correct firewall define' do
-      content = catalogue.resource('firewall', 'openntpd_tcp_42').send(:parameters)[:tool]
+      content = catalogue.resource('firewall', 'openntpd_udp_42').send(:parameters)[:tool]
       content.should == "iptables"
     end
   end
 
   describe 'Test OldGen Module Set Integration' do
-    let(:params) { {:monitor => "yes" , :monitor_tool => "puppi" , :firewall => "yes" , :firewall_tool => "iptables" , :puppi => "yes" , :port => "42" } }
+    let(:params) { {:monitor => "yes" , :monitor_tool => "puppi" , :firewall => "yes" , :firewall_tool => "iptables" , :puppi => "yes" , :port => "42" , :protocol => 'udp' } }
 
     it 'should generate monitor resources' do
       content = catalogue.resource('monitor::process', 'openntpd_process').send(:parameters)[:tool]
       content.should == "puppi"
     end
     it 'should generate firewall resources' do
-      content = catalogue.resource('firewall', 'openntpd_tcp_42').send(:parameters)[:tool]
+      content = catalogue.resource('firewall', 'openntpd_udp_42').send(:parameters)[:tool]
       content.should == "iptables"
     end
     it 'should generate puppi resources ' do 

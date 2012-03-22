@@ -300,7 +300,7 @@ class openntpd (
   }
 
   $manage_service_autorestart = $openntpd::bool_service_autorestart ? {
-    true    => 'Service[openntpd]',
+    true    => Service['openntpd'],
     false   => undef,
   }
 

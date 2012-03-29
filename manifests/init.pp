@@ -441,8 +441,8 @@ class openntpd (
   ### Firewall management, if enabled ( firewall => true )
   if $openntpd::bool_firewall == true {
     firewall { "openntpd_${openntpd::protocol}_${openntpd::port}":
-      source      => $openntpd::firewall_source,
-      destination => $openntpd::firewall_destination,
+      source      => $openntpd::firewall_src,
+      destination => $openntpd::firewall_dst,
       protocol    => $openntpd::protocol,
       port        => $openntpd::port,
       action      => 'allow',

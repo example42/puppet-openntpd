@@ -107,7 +107,7 @@ class openntpd::params {
   $my_class = ''
   $source = ''
   $source_dir = ''
-  $source_dir_purge = ''
+  $source_dir_purge = false
   $template = 'openntpd/ntpd.conf.erb'
   $options = ''
   $service_autorestart = true

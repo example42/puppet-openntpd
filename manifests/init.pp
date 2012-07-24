@@ -393,7 +393,7 @@ class openntpd (
       notify  => $openntpd::manage_service_autorestart,
       source  => $openntpd::source_dir,
       recurse => true,
-      purge   => $openntpd::source_dir_purge,
+      purge   => $openntpd::bool_source_dir_purge,
       replace => $openntpd::manage_file_replace,
       audit   => $openntpd::manage_audit,
     }

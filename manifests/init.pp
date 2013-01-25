@@ -227,6 +227,8 @@ class openntpd (
   $source_dir_purge    = params_lookup( 'source_dir_purge' ),
   $template            = params_lookup( 'template' ),
   $service_autorestart = params_lookup( 'service_autorestart' , 'global' ),
+  $init_source         = params_lookup( 'init_source' ),
+  $init_template       = params_lookup( 'init_template' ),
   $options             = params_lookup( 'options' ),
   $absent              = params_lookup( 'absent' ),
   $disable             = params_lookup( 'disable' ),
@@ -341,6 +343,16 @@ class openntpd (
     default   => template($openntpd::template),
   }
 
+  $manage_file_init_source = $openntpd::init_source ? {
+    ''        => undef,
+    default   => $openntpd::init_source,
+  }
+
+  $manage_file_init_content = $openntpd::init_template ? {
+    ''        => undef,
+    default   => template($openntpd::init_template),
+  }
+
   ### Managed resources
   package { 'openntpd':
     ensure => $openntpd::manage_package,
@@ -379,6 +391,7 @@ class openntpd (
     group   => $openntpd::config_file_group,
     require => Package['openntpd'],
     notify  => $openntpd::manage_service_autorestart,
+    source  => $openntpd::manage_file_init_source,
     content => $openntpd::manage_file_init_content,
     replace => $openntpd::manage_file_replace,
     audit   => $openntpd::manage_audit,

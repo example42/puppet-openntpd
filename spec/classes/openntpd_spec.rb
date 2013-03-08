@@ -121,11 +121,8 @@ describe 'openntpd' do
     end
   end
 
-  describe 'Test service autorestart', :broken => 'true' do
-    it 'should automatically restart the service, by default' do
-      content = catalogue.resource('file', 'openntpd.conf').send(:parameters)[:notify]
-      content.should == "Service[openntpd]"
-    end
+  describe 'Test service autorestart' do
+    it { should contain_file('openntpd.conf').with_notify('Service[openntpd]') }
   end
 
   describe 'Test service autorestart' do

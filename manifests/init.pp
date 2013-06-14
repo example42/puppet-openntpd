@@ -280,8 +280,8 @@ class openntpd (
   $manage_package = $openntpd::bool_absent ? {
     true  => 'absent',
     false => $openntpd::package ? {
-      ''      => 'absent',
-      default => 'present',
+      dummy-openntpd => 'absent',
+      default        => 'present',
     } 
   }
 

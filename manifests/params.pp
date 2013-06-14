@@ -36,7 +36,7 @@ class openntpd::params {
   ### Application related parameters
 
   $package = $::operatingsystem ? {
-    /(?i:OpenBSD)/ => '',
+    /(?i:OpenBSD)/ => 'dummy-openntpd',
     default        => 'openntpd',
   }
 

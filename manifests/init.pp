@@ -279,7 +279,10 @@ class openntpd (
   ### Definition of some variables used in the module
   $manage_package = $openntpd::bool_absent ? {
     true  => 'absent',
-    false => 'present',
+    false => $openntpd::package ? {
+      ''      => 'absent',
+      default => 'present',
+    } 
   }
 
   $manage_service_enable = $openntpd::bool_disableboot ? {
@@ -353,6 +356,14 @@ class openntpd (
     default   => template($openntpd::init_template),
   }
 
+  $manage_file_init = $openntpd::bool_absent ? {
+    true    => 'absent',
+    default => $::operatingsystem ? {
+      /(?i:OpenBSD)/ => 'absent',
+      default        => 'present',
+    }
+  }
+
   ### Managed resources
   package { 'openntpd':
     ensure => $openntpd::manage_package,
@@ -384,7 +395,7 @@ class openntpd (
   }
 
   file { 'openntpd.init':
-    ensure  => $openntpd::manage_file,
+    ensure  => $openntpd::manage_file_init,
     path    => $openntpd::config_file_init,
     mode    => $openntpd::config_file_mode,
     owner   => $openntpd::config_file_owner,

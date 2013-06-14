@@ -86,6 +86,7 @@ class openntpd::params {
 
   $config_file_init = $::operatingsystem ? {
     /(?i:Debian|Ubuntu|Mint)/ => '/etc/default/openntpd',
+    /(?i:OpenBSD)/            => '',
     default                   => '/etc/sysconfig/openntpd',
   }
 

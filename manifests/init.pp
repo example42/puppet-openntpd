@@ -358,14 +358,6 @@ class openntpd (
     default   => template($openntpd::init_template),
   }
 
-  $manage_file_init = $openntpd::bool_absent ? {
-    true    => 'absent',
-    default => $::operatingsystem ? {
-      /(?i:OpenBSD)/ => 'absent',
-      default        => 'present',
-    }
-  }
-
   ### Managed resources
   if $openntpd::package {
     package { 'openntpd':
@@ -398,18 +390,20 @@ class openntpd (
     audit   => $openntpd::manage_audit,
   }
 
-  file { 'openntpd.init':
-    ensure  => $openntpd::manage_file_init,
-    path    => $openntpd::config_file_init,
-    mode    => $openntpd::config_file_mode,
-    owner   => $openntpd::config_file_owner,
-    group   => $openntpd::config_file_group,
-    require => $require_package,
-    notify  => $openntpd::manage_service_autorestart,
-    source  => $openntpd::manage_file_init_source,
-    content => $openntpd::manage_file_init_content,
-    replace => $openntpd::manage_file_replace,
-    audit   => $openntpd::manage_audit,
+  if $openntpd::config_file_init {
+    file { 'openntpd.init':
+      ensure  => $openntpd::manage_file,
+      path    => $openntpd::config_file_init,
+      mode    => $openntpd::config_file_mode,
+      owner   => $openntpd::config_file_owner,
+      group   => $openntpd::config_file_group,
+      require => $require_package,
+      notify  => $openntpd::manage_service_autorestart,
+      source  => $openntpd::manage_file_init_source,
+      content => $openntpd::manage_file_init_content,
+      replace => $openntpd::manage_file_replace,
+      audit   => $openntpd::manage_audit,
+    }
   }
 
   # The whole openntpd configuration directory can be recursively overriden

@@ -18,7 +18,7 @@
 #   Set to true if you want to force an ntp sync if if the local clock is off
 #   by more than 180 seconds (option -s). Default: true
 #
-# [*file_init_content*]
+# [*init_template*]
 #   Location of the template to use to populate openntpd init file.
 #   
 # Standard class parameters
@@ -220,7 +220,6 @@ class openntpd (
   $server              = params_lookup( 'server' ),
   $server_local        = params_lookup( 'server_local' ),
   $force_startup_sync  = params_lookup( 'force_startup_sync' ),
-  $file_init_content   = params_lookup( 'file_init_content' ),
   $my_class            = params_lookup( 'my_class' ),
   $source              = params_lookup( 'source' ),
   $source_dir          = params_lookup( 'source_dir' ),

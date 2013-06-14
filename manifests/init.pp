@@ -20,7 +20,7 @@
 #
 # [*init_template*]
 #   Location of the template to use to populate openntpd init file.
-#   
+#
 # Standard class parameters
 # Define the general class behaviour and customizations
 #

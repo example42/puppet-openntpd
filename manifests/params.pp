@@ -36,11 +36,13 @@ class openntpd::params {
   ### Application related parameters
 
   $package = $::operatingsystem ? {
-    default => 'openntpd',
+    /(?i:OpenBSD)/ => '',
+    default        => 'openntpd',
   }
 
   $service = $::operatingsystem ? {
-    default => 'openntpd',
+    /(?i:OpenBSD)/ => 'ntpd',
+    default        => 'openntpd',
   }
 
   $service_status = $::operatingsystem ? {
@@ -56,7 +58,8 @@ class openntpd::params {
   }
 
   $process_user = $::operatingsystem ? {
-    default => 'openntpd',
+    /(?i:OpenBSD)/ => '_ntp',
+    default        => 'openntpd',
   }
 
   $config_dir = $::operatingsystem ? {
@@ -64,7 +67,8 @@ class openntpd::params {
   }
 
   $config_file = $::operatingsystem ? {
-    default => '/etc/openntpd/ntpd.conf',
+    /(?i:OpenBSD)/ => '/etc/ntpd.conf',
+    default        => '/etc/openntpd/ntpd.conf',
   }
 
   $config_file_mode = $::operatingsystem ? {
@@ -76,7 +80,8 @@ class openntpd::params {
   }
 
   $config_file_group = $::operatingsystem ? {
-    default => 'root',
+    /(?i:OpenBSD)/ => 'wheel',
+    default        => 'root',
   }
 
   $config_file_init = $::operatingsystem ? {

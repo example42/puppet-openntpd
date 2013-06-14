@@ -278,11 +278,13 @@ class openntpd (
 
   ### Definition of some variables used in the module
   $manage_package = $openntpd::bool_absent ? {
-    true  => 'absent',
-    false => $openntpd::package ? {
-      ''      => 'absent',
-      default => 'present',
-    } 
+    true    => 'absent',
+    default => 'present',
+  }
+
+  $require_package = $openntpd::package ? {
+    ''      => undef,
+    default => Package['openntpd'],
   }
 
   $manage_service_enable = $openntpd::bool_disableboot ? {
@@ -365,9 +367,11 @@ class openntpd (
   }
 
   ### Managed resources
-  package { 'openntpd':
-    ensure => $openntpd::manage_package,
-    name   => $openntpd::package,
+  if $openntpd::package {
+    package { 'openntpd':
+      ensure => $openntpd::manage_package,
+      name   => $openntpd::package,
+    }
   }
 
   service { 'openntpd':
@@ -377,7 +381,7 @@ class openntpd (
     hasstatus  => $openntpd::service_status,
     hasrestart => false,
     pattern    => $openntpd::process,
-    require    => Package['openntpd'],
+    require    => $require_package,
   }
 
   file { 'openntpd.conf':
@@ -386,7 +390,7 @@ class openntpd (
     mode    => $openntpd::config_file_mode,
     owner   => $openntpd::config_file_owner,
     group   => $openntpd::config_file_group,
-    require => Package['openntpd'],
+    require => $require_package,
     notify  => $openntpd::manage_service_autorestart,
     source  => $openntpd::manage_file_source,
     content => $openntpd::manage_file_content,
@@ -400,7 +404,7 @@ class openntpd (
     mode    => $openntpd::config_file_mode,
     owner   => $openntpd::config_file_owner,
     group   => $openntpd::config_file_group,
-    require => Package['openntpd'],
+    require => $require_package,
     notify  => $openntpd::manage_service_autorestart,
     source  => $openntpd::manage_file_init_source,
     content => $openntpd::manage_file_init_content,
@@ -413,7 +417,7 @@ class openntpd (
     file { 'openntpd.dir':
       ensure  => directory,
       path    => $openntpd::config_dir,
-      require => Package['openntpd'],
+      require => $require_package,
       notify  => $openntpd::manage_service_autorestart,
       source  => $openntpd::source_dir,
       recurse => true,

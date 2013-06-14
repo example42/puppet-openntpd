@@ -18,9 +18,9 @@
 #   Set to true if you want to force an ntp sync if if the local clock is off
 #   by more than 180 seconds (option -s). Default: true
 #
-# [*file_init_content*]
+# [*init_template*]
 #   Location of the template to use to populate openntpd init file.
-#   
+#
 # Standard class parameters
 # Define the general class behaviour and customizations
 #
@@ -220,7 +220,6 @@ class openntpd (
   $server              = params_lookup( 'server' ),
   $server_local        = params_lookup( 'server_local' ),
   $force_startup_sync  = params_lookup( 'force_startup_sync' ),
-  $file_init_content   = params_lookup( 'file_init_content' ),
   $my_class            = params_lookup( 'my_class' ),
   $source              = params_lookup( 'source' ),
   $source_dir          = params_lookup( 'source_dir' ),
@@ -278,11 +277,13 @@ class openntpd (
 
   ### Definition of some variables used in the module
   $manage_package = $openntpd::bool_absent ? {
-    true  => 'absent',
-    false => $openntpd::package ? {
-      ''      => 'absent',
-      default => 'present',
-    } 
+    true    => 'absent',
+    default => 'present',
+  }
+
+  $require_package = $openntpd::package ? {
+    ''      => undef,
+    default => Package['openntpd'],
   }
 
   $manage_service_enable = $openntpd::bool_disableboot ? {
@@ -356,18 +357,12 @@ class openntpd (
     default   => template($openntpd::init_template),
   }
 
-  $manage_file_init = $openntpd::bool_absent ? {
-    true    => 'absent',
-    default => $::operatingsystem ? {
-      /(?i:OpenBSD)/ => 'absent',
-      default        => 'present',
-    }
-  }
-
   ### Managed resources
-  package { 'openntpd':
-    ensure => $openntpd::manage_package,
-    name   => $openntpd::package,
+  if $openntpd::package {
+    package { 'openntpd':
+      ensure => $openntpd::manage_package,
+      name   => $openntpd::package,
+    }
   }
 
   service { 'openntpd':
@@ -377,7 +372,7 @@ class openntpd (
     hasstatus  => $openntpd::service_status,
     hasrestart => false,
     pattern    => $openntpd::process,
-    require    => Package['openntpd'],
+    require    => $require_package,
   }
 
   file { 'openntpd.conf':
@@ -386,7 +381,7 @@ class openntpd (
     mode    => $openntpd::config_file_mode,
     owner   => $openntpd::config_file_owner,
     group   => $openntpd::config_file_group,
-    require => Package['openntpd'],
+    require => $require_package,
     notify  => $openntpd::manage_service_autorestart,
     source  => $openntpd::manage_file_source,
     content => $openntpd::manage_file_content,
@@ -394,18 +389,20 @@ class openntpd (
     audit   => $openntpd::manage_audit,
   }
 
-  file { 'openntpd.init':
-    ensure  => $openntpd::manage_file_init,
-    path    => $openntpd::config_file_init,
-    mode    => $openntpd::config_file_mode,
-    owner   => $openntpd::config_file_owner,
-    group   => $openntpd::config_file_group,
-    require => Package['openntpd'],
-    notify  => $openntpd::manage_service_autorestart,
-    source  => $openntpd::manage_file_init_source,
-    content => $openntpd::manage_file_init_content,
-    replace => $openntpd::manage_file_replace,
-    audit   => $openntpd::manage_audit,
+  if $openntpd::config_file_init {
+    file { 'openntpd.init':
+      ensure  => $openntpd::manage_file,
+      path    => $openntpd::config_file_init,
+      mode    => $openntpd::config_file_mode,
+      owner   => $openntpd::config_file_owner,
+      group   => $openntpd::config_file_group,
+      require => $require_package,
+      notify  => $openntpd::manage_service_autorestart,
+      source  => $openntpd::manage_file_init_source,
+      content => $openntpd::manage_file_init_content,
+      replace => $openntpd::manage_file_replace,
+      audit   => $openntpd::manage_audit,
+    }
   }
 
   # The whole openntpd configuration directory can be recursively overriden
@@ -413,7 +410,7 @@ class openntpd (
     file { 'openntpd.dir':
       ensure  => directory,
       path    => $openntpd::config_dir,
-      require => Package['openntpd'],
+      require => $require_package,
       notify  => $openntpd::manage_service_autorestart,
       source  => $openntpd::source_dir,
       recurse => true,

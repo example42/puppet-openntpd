@@ -17,7 +17,7 @@ class openntpd::params {
   ### Class specific variables
 
   # Template for init file
-  $file_init_content = $::operatingsystem ? {
+  $init_template = $::operatingsystem ? {
     /(?i:RedHat|Centos|Scientific|Fedora)/ => 'openntpd/openntpd_initd-redhat.erb',
     default                                => 'openntpd/openntpd_initd-debian.erb',
   }
@@ -86,6 +86,7 @@ class openntpd::params {
 
   $config_file_init = $::operatingsystem ? {
     /(?i:Debian|Ubuntu|Mint)/ => '/etc/default/openntpd',
+    /(?i:OpenBSD)/            => '',
     default                   => '/etc/sysconfig/openntpd',
   }
 
